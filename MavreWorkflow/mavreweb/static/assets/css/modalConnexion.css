@@ -1,0 +1,147 @@
+/* --
+  -- Nom du fichier : modalConnexion.css
+  -- Nom du redacteur : Franck Souverain MAZIKOU
+  -- Date de redaction : 02/09/2021
+-- */
+
+
+/* -- Pour tous les elements -- */
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+
+/* -- -- */
+
+
+/* -- Pour le bloc modal connexion -- */
+
+.modalConnexion {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 0.3em;
+    z-index: 10;
+    background-color: white;
+    width: 500px;
+    max-width: 80%;
+    padding: 1em 0em;
+}
+
+.modalConnexion.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header .modal-titre {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.modal-header .close-modal-button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 36px;
+}
+
+.modal-body {
+    padding: 10px 15px;
+}
+
+#blocMessageConnexion {
+    display: none;
+}
+
+#overlay {
+    position: fixed;
+    opacity: 0;
+    z-index: 1;
+    transition: 200ms ease-in-out;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15.7, 54.9, 86.7, 0.1);
+    pointer-events: none;
+}
+
+#overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.formulaire-connexion>input {
+    width: 100%;
+    height: 3em;
+    background-color: #ffffff;
+    color: #232323;
+    border: 0.1em solid #e1e1e1;
+    border-radius: 0.3em;
+    padding: 0em 1em;
+    margin: 0.5em 0em;
+}
+
+.formulaire-connexion>button {
+    width: 100%;
+    height: 3em;
+    background-color: #288cdd;
+    color: #ffffff;
+    border: 0.1em solid #288cdd;
+    border-radius: 0.3em;
+    cursor: pointer;
+    margin: 0.5em 0em 2em 0em;
+}
+
+.separateur-du-bloc {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+.separateur-du-bloc>hr {
+    width: 30%;
+    border: 1px solid #e1e1e1;
+}
+
+.lien-vers-autres-pages {
+    text-align: center;
+}
+
+.lien-vers-autres-pages a {
+    color: #288cdd;
+}
+
+.lien-vers-autres-pages p {
+    margin-top: 1em;
+}
+
+@media all and (max-width: 1100px) {
+    /* -- Modification du modal de connexion -- */
+    .modalConnexion {
+        max-width: 90%;
+    }
+}
+
+@media all and (max-device-width: 1100px) {
+    /* -- Modification du modal de connexion -- */
+    .modalConnexion {
+        max-width: 90%;
+    }
+}
+
+
+/* -- -- */

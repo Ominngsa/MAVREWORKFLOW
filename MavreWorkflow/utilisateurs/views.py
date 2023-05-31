@@ -4,7 +4,7 @@ from django.contrib.messages.api import error
 from django.db.models.query_utils import Q
 from django.http.response import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import UsagerProfil, CampagnieAssurance, Commandes, CommandesMedicaments, Livraisons, Medicament, MedicamentsOrdonnance,Assure,AyantDroit,DomaineDetude
+from .models import UsagerProfil, CampagnieAssurance, Commandes, CommandesMedicaments, Livraisons, Medicament,Assure,AyantDroit,DomaineDetude, Visualiser, Souche
 from django.contrib.auth import logout
 from django.views.generic import View
 from django.core.paginator import Paginator
@@ -40,7 +40,7 @@ def acceuilUtilisateur(request) :
             contexte = {" username " : username , "profil" : profil, "listesCommandes" : listeCommandes , "listeLivraisons" : listeLivraisons}
 
             # -- retourne le template -- # 
-            return render(request,'' , contexte)
+            return render(request,'LeFichierATrouver' , contexte)
         except :
             # -- retourne une erreur 404 -- #
             raise Http404
@@ -255,7 +255,7 @@ def suppressionCompte(request) :
 def commandesRecus(request) :
     # -- docstring de la vue -- #
     """
-        -- Cette vue permet de rediriger l'utilisateurs vers le tableau avec les commandes validés
+        -- Cette vue permet de rediriger l'utilisateurs vers le tableau avec les commandes reçus
     """        
     # -- vérification de la connexion utilisateur -- #
     if request.user.is_authenticated:
@@ -281,7 +281,7 @@ def rechercheFormUsager(request) :
     # -- docstring de la vue -- #
     """
         -- Cette vue permet de rédiriger le vendeur vers le template
-        -- Pour rechercher un assuré
+        -- Pour rechercher
     """
 
     # -- vérification de la connexion utilisateur -- #
@@ -341,3 +341,178 @@ def rechercheUsager(request, motCle):
         elif motCle == "ayantdroit":
             # -- faire une recherche sur le mot clé ayantdroit (avec la classe modèle AyantDroit)
             listeElement = AyantDroit.objects.order_by('-nom_ayantDroit')
+
+            # -- création de la pagination -- #
+            paginationAyantDroit = Paginator(listeElement,3)
+            nombrePage = request.GET.get('page')
+            objectPage = paginationAyantDroit.get_page(nombrePage)
+        else : 
+            # -- faire une recherche sur le mot clé (avec la classe modèle) -- #
+            listeElement = UsagerProfil.objects.order_by('-nom_usager')
+            """
+                maybe rechercher les vendeurs
+            """
+
+            # -- récupération de dix assurés et ayantDroit aléatoirement -- #
+            listeAssures = Assure.objects.order_by('?')[:10]
+            listeAyantDroit = AyantDroit.objects.order_by('?')[:10]
+
+            # -- récupération des domaines d'études -- #
+            listeDomaineEtude = DomaineDetude.objects.order_by('nomDomaineEtude')
+
+            context = {"usager" : usager, "profil" : profil, "listeAssures" : listeAssures, "listeAyantDroit" : listeAyantDroit, 'listeElement' : objectPage, 'listeDomaineEtude': listeDomaineEtude}
+
+            # -- retourne le template -- #
+            return render(request, 'TrouverLeFichier', context)
+    else : 
+        # -- retourne une erreur 404 -- #
+        raise Http404
+class AjouterAssure(View): 
+    # -- docstring de la vue -- #
+    """
+        -- Cette vue permet de créer un assure 
+    """
+
+    # -- mise en place des sous fonctions -- #
+    def get(self,request):
+        # -- docstring de la sous fonction -- #
+        """
+            -- Cette sous fonction permet de récupérer les identifiants passés par la méthode GET à travers AJAX
+
+        """
+
+        # -- vérification de la connexion usager -- #
+        if request.user.is_authenticated :
+            # -- vérification de la méthode -- #
+            if request.method == "GET" and 'nom_assure' in request.GET and 'prenom_assure' in request.GET and 'adresse_assure' in request.GET and 'datenaiss_assure' in request.GET and 'telephone_assure' in request.GET :
+                # -- recuperation des identifiants de l'assuré -- #
+                nom_assure = request.GET.get('nom_assure')
+                prenom_assure = request.GET.get('prenom_assure')
+                adresse_assure = request.GET.get('adresse_assure')
+                datenaiss_assure = request.GET.get('datenaiss_assure')
+                telephone_assure = request.GET.get('telephone_assure')
+
+                # -- récupération d'un profil de l'usager -- #
+                profil = get_object_or_404(UsagerProfil, account = request.user.id)
+
+                # -- création d'un assuré -- # 
+                nouvelAssure = Assure(nom_assure = nom_assure, prenom_assure = prenom_assure, adresse_assure = adresse_assure, datenaiss_assure = datenaiss_assure, telephone_assure = telephone_assure, idUsager = profil)
+                nouvelAssure.save()
+
+                # -- retourne True -- #
+                return JsonResponse({'messageAssure' : True}, statuts = 200)
+            else:
+                # -- retourne un False -- #
+                return JsonResponse({'messageAssure' : False}, statuts = 200)
+        else : 
+            # -- retourne une erreur -- #
+            raise Http404
+    def afficherCommandeUsager(request,numeroCommande) : 
+        # -- docstring de la vue -- #
+        """
+            -- Cette vue a pour but de rediriger l'usager vers le template afficherCommandeUsager
+        """
+
+        # -- vérification de la connexion usager -- #
+        if request.user.is_authenticated :
+            # -- vérification de l'identifiant de l'usager -- #
+            identifiantUsager = request.user.id
+
+            # -- récupération des informations usager -- #
+            usager = get_object_or_404(User, pk = identifiantUsager)
+            profil = get_object_or_404(UsagerProfil, account = identifiantUsager)
+
+            # -- récupération des informations de la commande -- #
+            commande = get_object_or_404(Commandes,pk=numeroCommande)
+
+            # -- récupération des informations de la commandesMedicaments -- #
+            commandesMedicament = get_object_or_404(CommandesMedicaments, pk=commandesMedicament)
+
+            # -- I THINK JE DOIS ASSOCIER LA TABLE Commandes*IFORGOT*
+
+            # -- création de la pagination -- #
+            paginationCommande = Paginator(commande,2)
+            nombrePage = request.GET.get('page')
+            objectPage = paginationCommande.get_page(nombrePage)
+
+            # -- mise en place du contexte -- #
+            context = {"usager" : usager, "profil": profil, 'commandes' : commande, 'commandesMedicaments' : commandesMedicament, 'pagination' : objectPage}
+
+            # -- retourne le template (afficherCommande.html) -- #
+            return render(request, 'TrouverLeFichier', context)
+        else : 
+            # -- retourne une erreur 404 -- #
+            raise Http404
+class visualisationSouche(View):
+    # -- docstring de la vue -- #
+    """
+        -- Cette vue permet de mentionner la lecture d'un souche
+    """
+    # -- mise en place des sous fonctions -- #
+    def get(self, request) : 
+        # -- docstring de la sous fonction -- #
+        """
+            -- Cette sous fonction a pour but de récupérer les identifiants passés par la méthode GET avec ajax
+        """
+
+        # -- définition des sous fonctions -- #
+        def verificationVisualisationSouche(identifiantUsager, codeSouche):
+            # -- docstring de la sous fonction -- #
+            """
+                -- Cette sous fonction a pour but de vérifier la visualisation d'une souche
+            """
+
+            try:
+                # -- tentative de récupération -- #
+                visuelSouche = Visualiser.objects.get(idUsager = identifiantUsager, code_souche = codeSouche)
+                # -- vérifications des identifiiants -- #
+                if visualisationSouche.idUsager == identifiantUsager and visuelSouche.code_souche == codeSouche : 
+                    # -- retourne vrai (True) -- #
+                    return True
+                else : 
+                    # -- retourne Faux (False) -- #
+                    return False
+            except : 
+                # -- retourne Faux (False) -- #
+                return False
+            
+        # -- vérification de la connexion usager -- #
+        if request.user.is_authenticated:
+            # -- vérification de la methode -- #
+            if request.method == "GET" and 'code_souche' in request.GET:
+                # -- récupération des identifiants -- #
+                code_souche = request.GET.get('code_souche')
+
+                # -- récupération du profil de l'utilisateur et de la souche -- #
+                profil = get_object_or_404(UsagerProfil, account = request.user.id)
+                souche = get_object_or_404(Souche, pk= code_souche)
+
+                # -- vérification d'une visualisation -- #
+                if verificationVisualisationSouche(profil, souche):
+                    # -- retourne Trouvée -- #
+                    return JsonResponse({'message': 'Troouvée'}, statuts = 200)
+                else : 
+                    # -- création d'une visualisation -- #
+                    nouvelleVisualisation = Visualiser(idUsager = profil, code_souche = souche)
+                    nouvelleVisualisation.save()
+
+                    # -- retourne True -- #
+                    return JsonResponse({'message' : True}, status = 200)
+            else :
+                # -- retourne un false -- #
+                return JsonResponse({'message' : False}, statuts=200)
+        else : 
+            # -- retourne une erreur -- #
+            raise Http404
+        
+
+def nouvelleSouche(request,idUsager):
+        # -- docstring de la vue -- #
+        """
+            -- Cette vue a pour but de créer une nouvelle souche
+        """
+        def verificationIdUsager(identifiantUsager):
+            # -- docstring de la fonction -- #
+            """
+                -- Cette sous fonction 
+            """

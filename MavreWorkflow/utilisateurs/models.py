@@ -10,7 +10,7 @@ class DomaineDetude(models.Model):
         -- De l'application utilisateur
     """
     # I'm still doubting about this class
-class UsagerProfil :
+class UsagerProfil(models.Model) :
     #--  --#
     """
         -- Cette classe UsagerProfil represente la table des profils utilisateurs
@@ -31,7 +31,7 @@ class UsagerProfil :
     def __str__(self):
         return f"Nom utilisateur : {self.account.username}"
 
-class Commandes : 
+class Commandes(models.Model) : 
     # -- docstring de la classe modèle Commandes -- #
     """
         -- Cette classe Commandes représente la table des commandes des assurés
@@ -40,8 +40,8 @@ class Commandes :
 
     # -- mise en place des attributs de la classe modèle Commandes -- #
     libelle_commande = models.TextField(null = True, max_length= 100)
-    date_commande = models.DamteTimeField(auto_now=True, null=False)
-    dateReception_commande = models.DateFieldTimeFiels(auto_now=True, null=False)
+    date_commande = models.DateTimeField(auto_now=True, null=False)
+    dateReception_commande = models.DateTimeField(auto_now=True, null=False)
 
     # -- mise en place de la méthode __str__ -- #
     def __str__(self):
@@ -53,13 +53,17 @@ class CommandesUsager(models.Model):
         -- De l'application utilisateur 
     """
 
+
+    qte_commandes_par_pair = models.TextField(max_length=50, null=True,)
     numero_commande = models.ForeignKey(Commandes, on_delete=models.CASCADE)
 
     id_usager = models.ForeignKey(UsagerProfil, on_delete=models.CASCADE)
 
-    qte_commandes_par_pair = models.TextField(max_length=50, null=True,)
+    # -- mise en place de la méthode __str__ -- #
+    def __str__(self):
+        return f"Quantité commandé hebdomadaire : {self.qte_commandes_par_pair}"
 
-class Medicament : 
+class Medicament(models.Model): 
     # -- docstring de la classe modèle Medicaments -- #
     """
         -- Cette classe Medicament représente la table des médicaments de la pharmacie
@@ -80,22 +84,22 @@ class Medicament :
     def get_absolute_url(self):
         return reverse("afficher_medicament", args=[str(self.id)])
     
-class CommandesMedicaments : 
+class CommandesMedicaments(models.Model): 
     # -- docstring de la classe modèle CommandesMédicaments -- #
     """
         -- Cette classe représente la tables CommandesMédicaments et
         -- est née de la relation de la classe Commandes et Médicaments
         
     """ 
+    qte_commander = models.BigIntegerField(null=False)
     numero_commandes = models.ForeignKey(Commandes, on_delete=models.CASCADE)
     numero_medicaments = models.ForeignKey(Medicament, on_delete=models.CASCADE)
-    qte_commander = models.BigIntegerField(null=False)
 
     # -- mise en place de la méthode __str__ -- #
     def __str__(self):
         return f"qte_commander : {self.qte_commander}"
 
-class Souche : 
+class Souche(models.Model): 
     # -- docstring de la classe modèle Souche -- #
     """
         -- Cette classe représente la table Souche 
@@ -103,14 +107,13 @@ class Souche :
         -- D'un assuré
     """ 
     #
-    id_usager = models.ForeignKey(UsagerProfil, on_delete= models.CASCADE)
-    #date_envoie = models.DateTimeField(auto_now=True, null = False)
     image_souche = models.ImageField(null=False)
+    id_usager = models.ForeignKey(UsagerProfil, on_delete= models.CASCADE)
 
     # -- mise en place de la méthode __str__ -- #
     def __str__(self):
         return f"image_souche : {self.image_souche}"
-class Livraisons : 
+class Livraisons(models.Model): 
     # -- docstring de la classe modèle Livraisons -- #
     """
         -- Cette classe représente la table Livraisons
@@ -129,7 +132,6 @@ class Vendeur(models.Model):
     """
         -- Cette classe représente la table Vendeur
     """
-    id_usager = models.ForeignKey(UsagerProfil, on_delete= models.CASCADE)
 
     # -- mise en place des attributs de la classe modèle Vendeur -- #
     nom_Vendeur = models.TextField(max_length=150, null=False)
@@ -137,6 +139,7 @@ class Vendeur(models.Model):
     adresse_Vendeur = models.TextField(max_length=150, null=False)
     datenaiss_Vendeur = models.DateField(null=True)
     telephone_Vendeur = models.IntegerField(null=False)
+    id_usager = models.ForeignKey(UsagerProfil, on_delete= models.CASCADE)
 
     # -- mise en place de la méthode __str__ --  #
     def __str__(self):
@@ -153,7 +156,7 @@ class Livreur(models.Model) :
     # -- mise en place de la méthode __str__ -- #
     def __str__(self):
         return f"Code vendeur : {self.code_vendeur}"
-class CampagnieAssurance :                                              
+class CampagnieAssurance(models.Model):                                              
     # -- docstring de la classe modèle CampagnieAssurance -- #
     """
         -- Cette classe répresente la table Compagnie Assurance
@@ -161,20 +164,20 @@ class CampagnieAssurance :
 
     # -- mise en place des attributs de la classe modèle CompagnieAssurance -- #
     nom_compagnieAssurance = models.TextField(max_length=150, null=False)
-    pourcentage = models.DecimalField(null=True)
+    pourcentage = models.DecimalField(null=True,decimal_places=True,max_digits=100)
 
     def __str__(self) :
         return f"Pourcentage : {self.pourcentage}"
-class Societe : 
+class Societe(models.Model) : 
     # -- docstring de la classe modèle Societe -- #
     """
         -- Cette classe répresente la table Societé
         -- Ce sont les societes qui sont assurés auprès des compagnies d'assurance
     """
-    code_campagnieAssurance = models.ForeignKey(CampagnieAssurance, on_delete= models.CASCADE)
 
     # -- mise en place des attributs de la classe Societe -- #
     nom_societe = models.TextField(max_length=50, null=False)
+    code_campagnieAssurance = models.ForeignKey(CampagnieAssurance, on_delete= models.CASCADE)
 
     # -- mise en place de la méthode __str__ -- #
     def __str__(self) : 
@@ -186,16 +189,14 @@ class Assure(models.Model) :
         -- Cette classe répresente la table des assures
         -- L'application utilisateurs 
     """
-
-    id_usager = models.ForeignKey(UsagerProfil, on_delete= models.CASCADE)
-    code_societe = models.ForeignKey(Societe , on_delete=models.CASCADE)
-
     nom_assure = models.TextField(max_length=150, null=False)
     prenom_assure = models.TextField(max_length=150, null=False)
     adresse_assure = models.TextField(max_length=150, null=False)
     datenaiss_assure = models.DateField(null=True)
     telephone_assure = models.IntegerField(null=False)
 
+    id_usager = models.ForeignKey(UsagerProfil, on_delete= models.CASCADE)
+    code_societe = models.ForeignKey(Societe , on_delete=models.CASCADE)
     # -- mise en place de la méthode __str__ -- #
     def __str__(self) :
         return f"Nom assure : {self.nom_assure}"
@@ -217,3 +218,19 @@ class AyantDroit(models.Model) :
     # -- mise en place de la méthode __str__ -- #
     def __str__(self) :
         return f"Nom ayant droit : {self.nom_ayantdroit}"
+
+class Visualiser(models.Model) :
+    # -- docstring de la classe modèle Lire -- #
+    """
+        -- Cette classe Visualiser represente la table des lectures de souches de 
+        -- L'application usager
+    """ 
+
+    # -- mise en place des attributs de la classe modèle Visualiser -- #
+    idUsager = models.ForeignKey(UsagerProfil, on_delete = models.CASCADE)
+    code_souche = models.ForeignKey(Souche, on_delete= models.CASCADE)
+    dateVisualiser = models.DateTimeField(auto_now= True, null=False)
+
+    # -- mise en place de la methode __str__ -- #
+    def __str__(self) :
+        return f"dateVisualiser : {self.dateVisualiser}"
