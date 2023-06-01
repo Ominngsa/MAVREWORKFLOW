@@ -22,6 +22,7 @@ from django.contrib.sitemaps.views import sitemap
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('',include('mavreweb.urls')),
     path('utilisateur/', include('utilisateurs.urls'))
 ]
 # -- pour les fichiers medias -- #
