@@ -1,6 +1,7 @@
-from django.contrib.auth.models import User,Group,Permission
+from django.contrib.auth.models import *
 from django.db import models
 from django.urls import reverse
+
 
 # Create your models here.
 class DomaineDetude(models.Model):
@@ -234,3 +235,5 @@ class Visualiser(models.Model) :
     # -- mise en place de la methode __str__ -- #
     def __str__(self) :
         return f"dateVisualiser : {self.dateVisualiser}"
+
+

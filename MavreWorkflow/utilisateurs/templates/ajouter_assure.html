@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ajouter un assure</title>
+</head>
+<body>
+    <h1>Ajouter un assure</h1>
+    <form method="POST" action="{% url 'ajouter_assure' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Ajouter</button>
+    </form>
+</body>
+</html>

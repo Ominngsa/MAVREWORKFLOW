@@ -1,18 +1,65 @@
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group 
 from django.contrib.messages.api import error
 from django.db.models.query_utils import Q
 from django.http.response import Http404, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from .models import UsagerProfil, CampagnieAssurance, Commandes, CommandesMedicaments, Livraisons, Medicament,Assure,AyantDroit,DomaineDetude, Visualiser, Souche
+from django.shortcuts import * 
+from .models import UsagerProfil, CampagnieAssurance, Commandes, CommandesMedicaments, Livraisons, Medicament,Assure,AyantDroit,DomaineDetude, Visualiser, Souche,Group
 from django.contrib.auth import logout
-from django.views.generic import View
-from django.core.paginator import Paginator
+from django.views.generic import *
+from django.core.paginator import  *
+from django.contrib.auth.decorators import *  
+from utilisateurs.forms import *
+
 
 # Create your views here.
 
 # -- définition des vues de l'application -- #
+# Utilisation des fonctions d'authentification
+# def my_view(request):
+#     # Création des groupes et des permissions (si nécessaire)
+#     create_groups_and_permissions()
 
+#     # Authentification d'un assure
+#     assure = authenticate_assure(matricule_salarie='12345')
+#     if assure:
+#         # Vérification des permissions
+#         if has_permission(user=request.user, permission_codename='change_commande'):
+#             # L'utilisateur a la permission de modifier les commandes
+#             # Faites quelque chose ici
+#             pass
+#         else:
+#             # L'utilisateur n'a pas la permission de modifier les commandes
+#             # Faites autre chose ici
+#             pass
+#     else:
+#         # L'assuré n'existe pas
+#         # Faites quelque chose ici
+#         pass
+# @login_required
+# def liste_commandes(request):
+#     commandes = Commandes.objects.all()
+#     return render(request,'liste_commandes.html', {'commandes' : commandes})
+
+# @login_required
+# @permission_required('utilisateurs.add_commande', raise_exception=True)
+# def ajouter_commande(request) : 
+#     if request.method == 'POST':
+#         # -- Traiter les données du formulaire d'ajout de commande
+#         # ...
+#         return redirect('liste_commandes')
+#     else:
+#         return render(request,'ajouter_commande.html')
+    
+def ajouter_assure(request):
+    if request.method == 'POST':
+        form = AssureForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_assures')
+    else:
+        form = AssureForm()
+    return render(request, 'ajouter_assure.html', {'form': form})
 def acceuilUtilisateur(request) :
     # -- docstring de la vue -- #
     """
